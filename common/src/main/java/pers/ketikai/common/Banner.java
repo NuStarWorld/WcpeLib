@@ -28,7 +28,11 @@ public abstract class Banner {
     private static final String FILE_NAME = "/banner.txt";
 
     public static List<String> lines() {
-        InputStream inputStream = Banner.class.getResourceAsStream(FILE_NAME);
+        return lines(Banner.class);
+    }
+
+    public static List<String> lines(Class<?> owner) {
+        InputStream inputStream = owner.getResourceAsStream(FILE_NAME);
         if (inputStream == null) {
             return Collections.emptyList();
         }

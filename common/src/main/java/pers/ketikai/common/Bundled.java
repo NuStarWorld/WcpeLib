@@ -33,11 +33,15 @@ public abstract class Bundled {
     private static final int BUNDLED_DIR_PATH_LENGTH = BUNDLED_DIR_PATH.length();
 
     public static void release(File destDir) {
-        release(destDir, "/", false);
+        release(Bundled.class, destDir, "/", false);
+    }
+
+    public static void release(Class<?> owner, File destDir) {
+        release(owner, destDir, "/", false);
     }
 
     public static void release(
-            File destDir, String path, boolean overlay
+            Class<?> owner, File destDir, String path, boolean overlay
     ) {
         String mode = overlay ? " (overlay)" : "";
         Log.debug("release bundled" + mode);
@@ -45,7 +49,7 @@ public abstract class Bundled {
 //            destDir.mkdirs();
 //        }
         String normalizedPath = Paths.get(BUNDLED_DIR_PATH, path).normalize().toString();
-        URL location = Bundled.class.getProtectionDomain().getCodeSource().getLocation();
+        URL location = owner.getProtectionDomain().getCodeSource().getLocation();
         File file;
         try {
             file = Paths.get(location.toURI()).toFile();
