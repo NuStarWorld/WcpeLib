@@ -87,6 +87,8 @@ subprojects {
         implementation("io.ktor:ktor-serialization-gson:$ktorVersion")
         implementation("org.jetbrains:annotations:13.0")
 
+        compileOnly("org.apache.logging.log4j:log4j-api:2.24.3")
+        compileOnly("org.slf4j:slf4j-api:2.0.17")
         compileOnly("org.projectlombok:lombok:1.18.34")
         annotationProcessor("org.projectlombok:lombok:1.18.34")
         testCompileOnly("org.projectlombok:lombok:1.18.34")
