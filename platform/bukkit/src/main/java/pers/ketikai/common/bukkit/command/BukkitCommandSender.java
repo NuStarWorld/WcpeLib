@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package pers.ketikai.common.command.bukkit;
+package pers.ketikai.common.bukkit.command;
 
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.entity.Entity;
+import org.bukkit.permissions.Permissible;
 import org.jetbrains.annotations.NotNull;
 import pers.ketikai.common.command.CommandSender;
 
@@ -29,13 +30,13 @@ import java.util.UUID;
 @RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public final class BukkitCommandSender implements CommandSender {
 
-    public static BukkitCommandSender of(@NotNull org.bukkit.command.CommandSender holder) {
+    public static BukkitCommandSender of(@NotNull Permissible holder) {
         Objects.requireNonNull(holder, "holder must not be null.");
         return new BukkitCommandSender(holder);
     }
 
     @NonNull
-    private final org.bukkit.command.CommandSender holder;
+    private final Permissible holder;
 
     @Override
     public @NotNull UUID getUniqueId() {
