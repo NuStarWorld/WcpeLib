@@ -4,3 +4,8 @@
 /.idea/
 /build/
 /.gradle/
+
+/common/build/
+/platform/bukkit/build/
+/platform/nukkit/build/
+/platform/bungeecord/build/
