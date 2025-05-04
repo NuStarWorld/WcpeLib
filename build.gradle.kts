@@ -100,7 +100,6 @@ subprojects {
     }
 
     java {
-        withSourcesJar()
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
@@ -123,13 +122,24 @@ subprojects {
                 freeCompilerArgs = listOf("-Xjvm-default=all", "-Xskip-metadata-version-check")
             }
         }
+        register<Jar>("sourcesJar") {
+            archiveBaseName.set("${rootProject.name}-${project.name}")
+            archiveClassifier.set("sources")
+            from(sourceSets.main.get().allSource)
+        }
+        named<Jar>("jar") {
+            archiveBaseName.set("${rootProject.name}-${project.name}")
+        }
         named<ShadowJar>("shadowJar") {
-            archiveFileName.set("${rootProject.name}-${project.name}-${project.version}.jar")
+            archiveBaseName.set("${rootProject.name}-${project.name}")
             relocate("io.netty", "top.wcpe.lib.io.netty")
-            enabled = false
         }
     }
     publishing {
+        if (project.name == "platform") {
+            return@publishing
+        }
+
         repositories {
             maven {
                 credentials {
@@ -149,16 +159,13 @@ subprojects {
 
         publications {
             create<MavenPublication>("maven") {
-                if (project.name == "platform") {
-                    return@create
-                }
                 artifactId = "${rootProject.name}-${project.name}".lowercase()
                 groupId = project.group.toString()
                 version = "${project.version}"
-                from(components["java"])
+                artifact(tasks.named("sourcesJar", Jar::class.java))
+                artifact(tasks.named("jar", Jar::class.java))
                 println("> Apply \"$groupId:$artifactId:$version\"")
             }
         }
     }
-
 }
