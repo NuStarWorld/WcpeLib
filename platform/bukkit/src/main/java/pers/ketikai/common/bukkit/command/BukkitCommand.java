@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package pers.ketikai.common.command.bukkit;
+package pers.ketikai.common.bukkit.command;
 
 import lombok.AccessLevel;
 import lombok.NonNull;
