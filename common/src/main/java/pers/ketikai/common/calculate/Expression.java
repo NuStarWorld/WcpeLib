@@ -23,6 +23,8 @@ import pers.ketikai.common.calculate.exception.ExpressionCalculationException;
 import pers.ketikai.common.calculate.exception.ExpressionException;
 import pers.ketikai.common.calculate.exception.ExpressionSyntaxException;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -241,11 +243,20 @@ public final class Expression implements Cloneable {
         Object numericVariable = null;
         if (numberBuilder.length() > 0) {
             try {
+                String string = numberBuilder.toString();
                 if (isDecimal) {
-                    numericVariable = Double.valueOf(numberBuilder.toString());
+                    try {
+                        numericVariable = Double.valueOf(string);
+                    } catch (NumberFormatException e) {
+                        numericVariable = new BigDecimal(string);
+                    }
                 }
                 else {
-                    numericVariable = Long.valueOf(numberBuilder.toString());
+                    try {
+                        numericVariable = Integer.valueOf(string);
+                    } catch (NumberFormatException e) {
+                        numericVariable = new BigInteger(string);
+                    }
                 }
             } catch (NumberFormatException e) {
                 throw new ExpressionSyntaxException(expression, line, column, e);

@@ -17,6 +17,16 @@
 package pers.ketikai.common.calculate;
 
 import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
+
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Getter
 public enum Operator implements Symbol {
@@ -49,22 +59,68 @@ public enum Operator implements Symbol {
         }
     }
 
+    private static final Set<Class<?>> INTEGER_CLASSES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+            Byte.class,
+            Short.class,
+            Integer.class,
+            Long.class
+    )));
+
+    @NotNull
+    public static BigInteger asBigInteger(@NotNull Number number) {
+        Objects.requireNonNull(number, "number must not be null.");
+        if (number instanceof BigInteger) {
+            return (BigInteger) number;
+        }
+        Class<? extends Number> numberClass = number.getClass();
+        if (INTEGER_CLASSES.contains(numberClass)) {
+            return BigInteger.valueOf(number.longValue());
+        }
+        return new BigInteger(number.toString());
+    }
+
+    private static final Set<Class<?>> DECIMAL_CLASSES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+            Float.class,
+            Double.class
+    )));
+
+    @NotNull
+    public static BigDecimal asBigDecimal(@NotNull Number number) {
+        Objects.requireNonNull(number, "number must not be null.");
+        if (number instanceof BigDecimal) {
+            return (BigDecimal) number;
+        }
+        Class<? extends Number> numberClass = number.getClass();
+        if (DECIMAL_CLASSES.contains(numberClass)) {
+            return BigDecimal.valueOf(number.doubleValue());
+        }
+        return new BigDecimal(number.toString());
+    }
+
+    public static final RoundingMode ROUNDING_MODE = RoundingMode.HALF_UP;
+
     public Number calculate(Number first, Number second) {
-        double firstVal = first.doubleValue();
-        double secondVal = second.doubleValue();
+        BigDecimal firstVal = asBigDecimal(first);
+        BigDecimal secondVal = asBigDecimal(second);
         switch (this) {
             case ADD:
-                return firstVal + secondVal;
+                return firstVal.add(secondVal);
             case SUBTRACT:
-                return firstVal - secondVal;
+                return firstVal.subtract(secondVal);
             case MULTIPLY:
-                return firstVal * secondVal;
+                return firstVal.multiply(secondVal);
             case DIVIDE:
-                return firstVal / secondVal;
+                return firstVal.divide(secondVal, ROUNDING_MODE);
             case MOD:
-                return firstVal % secondVal;
+                return firstVal.remainder(secondVal);
             case POWER:
-                return Math.pow(firstVal, secondVal);
+                int exponent = secondVal.intValue();
+                if (exponent < 0) {
+                    exponent = -exponent;
+                    BigDecimal positivePow = firstVal.pow(exponent);
+                    return BigDecimal.ONE.divide(positivePow, ROUNDING_MODE);
+                }
+                return firstVal.pow(exponent);
             default:
                 throw new IllegalArgumentException("Unknown operator: " + this);
         }
