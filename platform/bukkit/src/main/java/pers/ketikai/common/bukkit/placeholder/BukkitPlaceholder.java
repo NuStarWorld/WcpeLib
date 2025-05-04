@@ -48,7 +48,6 @@ public final class BukkitPlaceholder extends PlaceholderExpansion {
     @NonNull
     @Getter
     private final String identifier;
-    private final String header = identifier + HEADER_DELIMITER;
     @NonNull
     @Getter
     private final String author;
@@ -58,10 +57,19 @@ public final class BukkitPlaceholder extends PlaceholderExpansion {
     @NonNull
     @Getter
     private final CommandLine commandLine;
+    private String header = null;
+    @NotNull
+    private String header() {
+        if (header == null) {
+            this.header = getIdentifier() + HEADER_DELIMITER;
+        }
+        return header;
+    }
 
     @Nullable
     private String[] argumentsOf(@NotNull String params) {
         Objects.requireNonNull(params, "params must not be null.");
+        String header = header();
         if (params.isEmpty() || !params.toLowerCase().startsWith(header.toLowerCase())) {
             return null;
         }
