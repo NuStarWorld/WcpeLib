@@ -125,6 +125,8 @@ class WcpeLib : JavaPlugin(), PlatformAdapter {
         logger.info("nms version: ${versionInfo.nmsClassPath}")
         logger.info("obc version: ${versionInfo.obcClassPath}")
         logger.info("Hook PlaceholderAPI: ${PlaceholderAPIHook.getPlugin()}")
+        // 增加字段
+        dataManager.addColumn("login_out_xyz", "VARCHAR(255)", "下线世界和坐标")
     }
 
     private fun initDefaultMapper() {

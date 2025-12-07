@@ -46,6 +46,10 @@ class WcpeLibPlaceholder : PlaceholderExpansion() {
                 val playerData = WcpeLib.dataManager.getPlayerDataByName(splitParams[1])
                 return playerData?.lastLoginTime.toString()
             }
+            "loginOutXYZ" -> {
+                val playerData = WcpeLib.dataManager.getPlayerDataByName(splitParams[1])
+                return playerData?.loginOutXYZ.toString()
+            }
         }
         return ""
 

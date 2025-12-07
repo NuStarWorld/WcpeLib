@@ -4,6 +4,7 @@ import kotlinx.coroutines.launch
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
+import org.bukkit.event.player.PlayerQuitEvent
 import top.wcpe.wcpelib.bukkit.entity.PlayerData
 
 /**
@@ -40,15 +41,30 @@ class WcpeLibListener : Listener {
                         } else {
                             logger.info("firstPlayed 为 [${firstPlayed}] 以这个时间为注册时间!")
                             firstPlayed
-                        }
+                        },
+                        loginOutXYZ = ""
                     )
                 )
                 return@launch
             }
-            logger.info("玩家: [${player.name}] 上一次进入的服务器: [${playerData.lastServerName}]")
-            playerData.lastServerName = WcpeLib.getServerName()
-            playerData.lastLoginTime = System.currentTimeMillis()
-            WcpeLib.dataManager.savePlayerData(playerData)
+            synchronized(playerData) {
+                logger.info("玩家: [${player.name}] 上一次进入的服务器: [${playerData.lastServerName}]")
+                playerData.lastServerName = WcpeLib.getServerName()
+                playerData.lastLoginTime = System.currentTimeMillis()
+                WcpeLib.dataManager.savePlayerData(playerData)
+            }
+        }
+    }
+
+    @EventHandler
+    fun on(e: PlayerQuitEvent) {
+        WcpeLib.pluginScope.launch {
+            val player = e.player
+            val playerData = WcpeLib.dataManager.getPlayerDataByName(player.name) ?: return@launch
+            synchronized(playerData) {
+                playerData.loginOutXYZ = "world:${player.world.name},x:${player.location.x.toInt()},y:${player.location.y.toInt()},z:${player.location.z.toInt()}"
+                WcpeLib.dataManager.savePlayerData(playerData)
+            }
         }
     }
 }

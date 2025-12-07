@@ -23,4 +23,8 @@ class NullDataManager : IDataManager {
     override fun savePlayerData(playerData: PlayerData): Boolean {
         return false
     }
+
+    override fun addColumn(columnName: String, columnType: String, columnComment: String) {
+        TODO("Not yet implemented")
+    }
 }

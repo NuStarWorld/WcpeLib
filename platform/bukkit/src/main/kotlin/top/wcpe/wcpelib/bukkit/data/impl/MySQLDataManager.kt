@@ -45,4 +45,14 @@ class MySQLDataManager(private val mybatis: Mybatis) : IDataManager {
             } > 0
         }
     }
+
+    override fun addColumn(columnName: String, columnType: String, columnComment: String) {
+        mybatis.sqlSessionFactory.openSession(true).use { sqlSession ->
+            val mapper = sqlSession.getMapper(PlayerDataMapper::class.java)
+            val columnExists = mapper.columnExists(columnName)
+            if (!columnExists) {
+                mapper.addColumn(columnName, columnType, columnComment)
+            }
+        }
+    }
 }
