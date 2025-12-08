@@ -3,18 +3,10 @@ package top.wcpe.wcpelib.bukkit
 import me.clip.placeholderapi.expansion.PlaceholderExpansion
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
+import java.time.DayOfWeek
+import java.time.LocalDate
+import java.util.UUID
 
-/**
- * 由 WCPE 在 2024/11/8 12:58 创建
- * <p>
- * Created by WCPE on 2024/11/8 12:58
- * <p>
- * <p>
- * GitHub  : <a href="https://github.com/wcpe">wcpe 's GitHub</a>
- * <p>
- * QQ      : 1837019522
- * @author : WCPE
- */
 class WcpeLibPlaceholder : PlaceholderExpansion() {
     override fun getAuthor(): String {
         return "WCPE"
@@ -30,40 +22,86 @@ class WcpeLibPlaceholder : PlaceholderExpansion() {
 
     //%WcpeLib_server_name%
     //%WcpeLib_display_name%
-    //%WcpeLib_firstLoginTime_{playerName}% 首次登录时间
-    //%WcpeLib_lastLoginTime_{playerName}% 最后登录时间
-    //%WcpeLib_loginOutXYZ_{playerName}% 下线世界和坐标
-    //%WcpeLib_todayOnlineTime_{playerName}% 当天在线时长
-    //%WcpeLib_todayLoginCount_{playerName}% 当天上线次数
+    //%WcpeLib_firstLoginTime_{playerName}%
+    //%WcpeLib_lastLoginTime_{playerName}%
+    //%WcpeLib_loginOutXYZ_{playerName}%
+    //%WcpeLib_todayOnlineMinutes_{playerName}%
+    //%WcpeLib_onlineMinutes_thisWeek_{playerName}%
+    //%WcpeLib_onlineMinutes_lastWeek_{playerName}%
+    //%WcpeLib_onlineMinutes_thisMonth_{playerName}%
     override fun onRequest(p: OfflinePlayer, identifier: String): String {
         when (identifier) {
             "server_name" -> return WcpeLib.getServerName()
             "display_name" -> return WcpeLib.getDisplayName()
         }
-        val splitParams = identifier.split("_")
-        when (splitParams[0]) {
+        val parts = identifier.split("_")
+        if (parts.isEmpty()) return ""
+        return when (parts[0]) {
             "firstLoginTime" -> {
-                val playerData = WcpeLib.dataManager.getPlayerDataByName(splitParams[1])
-                return playerData?.firstLoginTime.toString()
+                val playerData = WcpeLib.dataManager.getPlayerDataByName(parts.getOrNull(1) ?: return "")
+                playerData?.firstLoginTime?.toString() ?: ""
             }
+
             "lastLoginTime" -> {
-                val playerData = WcpeLib.dataManager.getPlayerDataByName(splitParams[1])
-                return playerData?.lastLoginTime.toString()
+                val playerData = WcpeLib.dataManager.getPlayerDataByName(parts.getOrNull(1) ?: return "")
+                playerData?.lastLoginTime?.toString() ?: ""
             }
+
             "loginOutXYZ" -> {
-                val playerData = WcpeLib.dataManager.getPlayerDataByName(splitParams[1])
-                return playerData?.loginOutXYZ.toString()
+                val playerData = WcpeLib.dataManager.getPlayerDataByName(parts.getOrNull(1) ?: return "")
+                playerData?.loginOutXYZ ?: ""
             }
-            "todayOnlineTime" -> {
-                val playerOnlineData = WcpeLib.playerOnlineManager.getPlayerOnlineData(Bukkit.getOfflinePlayer(splitParams[1]).uniqueId)
-                return playerOnlineData?.onlineMinutes.toString()
+
+            "todayOnlineMinutes", "todayOnlineTime" -> {
+                val uuid = resolveUuid(parts.getOrNull(1)) ?: return ""
+                val today = LocalDate.now()
+                WcpeLib.dataManager.getPlayerOnlineData(uuid, today).onlineMinutes.toString()
             }
+
             "todayLoginCount" -> {
-                val playerOnlineData = WcpeLib.playerOnlineManager.getPlayerOnlineData(Bukkit.getOfflinePlayer(splitParams[1]).uniqueId)
+                val uuid = resolveUuid(parts.getOrNull(1)) ?: return ""
+                val playerOnlineData = WcpeLib.playerOnlineManager.getPlayerOnlineData(uuid)
                 return playerOnlineData?.loginCount.toString()
             }
-        }
-        return ""
 
+            "onlineMinutes" -> {
+                val scope = parts.getOrNull(1) ?: return ""
+                val uuid = resolveUuid(parts.getOrNull(2)) ?: return ""
+                val today = LocalDate.now()
+                val result = when (scope) {
+                    "thisWeek" -> {
+                        val start = today.with(DayOfWeek.MONDAY)
+                        WcpeLib.dataManager.getPlayerOnlineMinutes(uuid, start, today)
+                    }
+
+                    "lastWeek" -> {
+                        val mondayThisWeek = today.with(DayOfWeek.MONDAY)
+                        val end = mondayThisWeek.minusDays(1)
+                        val start = end.minusDays(6)
+                        WcpeLib.dataManager.getPlayerOnlineMinutes(uuid, start, end)
+                    }
+
+                    "thisMonth" -> {
+                        val time = System.currentTimeMillis()
+                        val start = today.withDayOfMonth(1)
+                        val playerOnlineMinutes = WcpeLib.dataManager.getPlayerOnlineMinutes(uuid, start, today)
+                        println("spend ${System.currentTimeMillis() - time}ms")
+                        playerOnlineMinutes
+                    }
+
+                    else -> 0
+                }
+                result.toString()
+            }
+
+            else -> ""
+        }
+    }
+
+    private fun resolveUuid(name: String?): UUID? {
+        if (name.isNullOrBlank()) {
+            return null
+        }
+        return Bukkit.getOfflinePlayer(name).uniqueId
     }
 }

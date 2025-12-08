@@ -19,4 +19,10 @@ interface PlayerOnlineMapper {
         @Param("playerUuid") playerUuid: UUID,
         @Param("statDate") statDate: LocalDate
     ): PlayerOnlineData?
+
+    fun sumOnlineMinutesBetween(
+        @Param("playerUuid") playerUuid: UUID,
+        @Param("startDate") startDate: LocalDate,
+        @Param("endDate") endDate: LocalDate,
+    ): Int?
 }

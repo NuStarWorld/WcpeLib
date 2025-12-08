@@ -38,4 +38,8 @@ class NullDataManager : IDataManager {
     override fun getPlayerOnlineData(playerUuid: UUID, statDate: LocalDate): PlayerOnlineData {
         return PlayerOnlineData.create(playerUuid)
     }
+
+    override fun getPlayerOnlineMinutes(playerUuid: UUID, startDate: LocalDate, endDate: LocalDate): Int {
+        return 0
+    }
 }

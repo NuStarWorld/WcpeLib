@@ -11,4 +11,5 @@ import java.util.*
 interface IPlayerOnlineDataManager {
     fun savePlayerOnlineData(playerOnlineData: PlayerOnlineData): Boolean
     fun getPlayerOnlineData(playerUuid: UUID, statDate: LocalDate): PlayerOnlineData
+    fun getPlayerOnlineMinutes(playerUuid: UUID, startDate: LocalDate, endDate: LocalDate): Int
 }
