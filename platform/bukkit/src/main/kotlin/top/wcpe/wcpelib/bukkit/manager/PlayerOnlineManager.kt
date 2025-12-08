@@ -141,6 +141,19 @@ class PlayerOnlineManager(
     fun getPlayerOnlineData(playerUuid: UUID): PlayerOnlineData? {
         return sessions[playerUuid]?.data
     }
+
+    fun addLoginCount(playerUuid: UUID) {
+        val session = sessions[playerUuid] ?: return
+        val data = session.data
+        session.lock.withLock {
+            session.data.loginCount++
+        }
+
+        val saved = dataManager.savePlayerOnlineData(data)
+        if (!saved) {
+            logger.warn("保存玩家 [{}] {} 在线时长失败", data.playerUuid, data.statDate)
+        }
+    }
 }
 
 private data class PlayerOnlineSession(

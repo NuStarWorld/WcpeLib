@@ -11,7 +11,8 @@ data class PlayerOnlineData(
     var id: Long? = null,
     var playerUuid: UUID,
     var statDate: LocalDate,
-    var onlineMinutes: Int = 0
+    var onlineMinutes: Int = 0,
+    var loginCount: Int = 0,
 ) {
     companion object {
         @JvmStatic

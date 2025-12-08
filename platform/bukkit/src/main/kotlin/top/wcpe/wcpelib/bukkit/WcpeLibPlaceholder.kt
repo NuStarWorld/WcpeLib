@@ -34,6 +34,7 @@ class WcpeLibPlaceholder : PlaceholderExpansion() {
     //%WcpeLib_lastLoginTime_{playerName}% 最后登录时间
     //%WcpeLib_loginOutXYZ_{playerName}% 下线世界和坐标
     //%WcpeLib_todayOnlineTime_{playerName}% 当天在线时长
+    //%WcpeLib_todayLoginCount_{playerName}% 当天上线次数
     override fun onRequest(p: OfflinePlayer, identifier: String): String {
         when (identifier) {
             "server_name" -> return WcpeLib.getServerName()
@@ -56,6 +57,10 @@ class WcpeLibPlaceholder : PlaceholderExpansion() {
             "todayOnlineTime" -> {
                 val playerOnlineData = WcpeLib.playerOnlineManager.getPlayerOnlineData(Bukkit.getOfflinePlayer(splitParams[1]).uniqueId)
                 return playerOnlineData?.onlineMinutes.toString()
+            }
+            "todayLoginCount" -> {
+                val playerOnlineData = WcpeLib.playerOnlineManager.getPlayerOnlineData(Bukkit.getOfflinePlayer(splitParams[1]).uniqueId)
+                return playerOnlineData?.loginCount.toString()
             }
         }
         return ""
