@@ -1,0 +1,22 @@
+package top.wcpe.wcpelib.bukkit.mapper
+
+import org.apache.ibatis.annotations.Param
+import top.wcpe.wcpelib.bukkit.entity.PlayerOnlineData
+import java.time.LocalDate
+import java.util.UUID
+
+/**
+ * 玩家在线时长统计数据表
+ */
+interface PlayerOnlineMapper {
+    fun createTable()
+
+    fun upsertOnlineMinutes(data: PlayerOnlineData): Int
+
+    fun listByPlayerUuid(@Param("playerUuid") playerUuid: UUID): List<PlayerOnlineData>
+
+    fun getByPlayerUuidAndStatDate(
+        @Param("playerUuid") playerUuid: UUID,
+        @Param("statDate") statDate: LocalDate
+    ): PlayerOnlineData?
+}

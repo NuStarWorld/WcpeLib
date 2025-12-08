@@ -2,8 +2,12 @@ package top.wcpe.wcpelib.bukkit.data.impl
 
 import top.wcpe.wcpelib.bukkit.data.IDataManager
 import top.wcpe.wcpelib.bukkit.entity.PlayerData
+import top.wcpe.wcpelib.bukkit.entity.PlayerOnlineData
 import top.wcpe.wcpelib.bukkit.mapper.PlayerDataMapper
+import top.wcpe.wcpelib.bukkit.mapper.PlayerOnlineMapper
 import top.wcpe.wcpelib.common.mybatis.Mybatis
+import java.time.LocalDate
+import java.util.*
 
 /**
  * 由 WCPE 在 2023/7/10 15:24 创建
@@ -20,10 +24,10 @@ import top.wcpe.wcpelib.common.mybatis.Mybatis
 class MySQLDataManager(private val mybatis: Mybatis) : IDataManager {
 
     init {
-        mybatis.addMapper(PlayerDataMapper::class.java)
+        mybatis.addMapper(PlayerDataMapper::class.java, PlayerOnlineMapper::class.java)
         mybatis.sqlSessionFactory.openSession(true).use { sqlSession ->
-            val mapper = sqlSession.getMapper(PlayerDataMapper::class.java)
-            mapper.createTable()
+            sqlSession.getMapper(PlayerDataMapper::class.java).createTable()
+            sqlSession.getMapper(PlayerOnlineMapper::class.java).createTable()
         }
     }
 
@@ -53,6 +57,20 @@ class MySQLDataManager(private val mybatis: Mybatis) : IDataManager {
             if (!columnExists) {
                 mapper.addColumn(columnName, columnType, columnComment)
             }
+        }
+    }
+
+    override fun savePlayerOnlineData(playerOnlineData: PlayerOnlineData): Boolean {
+        mybatis.sqlSessionFactory.openSession(true).use { sqlSession ->
+            val mapper = sqlSession.getMapper(PlayerOnlineMapper::class.java)
+            return mapper.upsertOnlineMinutes(playerOnlineData) > 0
+        }
+    }
+
+    override fun getPlayerOnlineData(playerUuid: UUID, statDate: LocalDate): PlayerOnlineData {
+        mybatis.sqlSessionFactory.openSession(true).use { sqlSession ->
+            val mapper = sqlSession.getMapper(PlayerOnlineMapper::class.java)
+            return PlayerOnlineData.or(playerUuid, mapper.getByPlayerUuidAndStatDate(playerUuid, statDate))
         }
     }
 }

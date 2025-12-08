@@ -2,6 +2,9 @@ package top.wcpe.wcpelib.bukkit.data.impl
 
 import top.wcpe.wcpelib.bukkit.data.IDataManager
 import top.wcpe.wcpelib.bukkit.entity.PlayerData
+import top.wcpe.wcpelib.bukkit.entity.PlayerOnlineData
+import java.time.LocalDate
+import java.util.*
 
 /**
  * 由 WCPE 在 2023/7/29 9:47 创建
@@ -26,5 +29,13 @@ class NullDataManager : IDataManager {
 
     override fun addColumn(columnName: String, columnType: String, columnComment: String) {
         TODO("Not yet implemented")
+    }
+
+    override fun savePlayerOnlineData(playerOnlineData: PlayerOnlineData): Boolean {
+        return false
+    }
+
+    override fun getPlayerOnlineData(playerUuid: UUID, statDate: LocalDate): PlayerOnlineData {
+        return PlayerOnlineData.create(playerUuid)
     }
 }
