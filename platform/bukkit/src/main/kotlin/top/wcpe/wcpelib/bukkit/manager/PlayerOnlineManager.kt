@@ -63,6 +63,38 @@ class PlayerOnlineManager(
         settle(player.uniqueId, System.currentTimeMillis(), true)
     }
 
+    fun addFlag(playerUuid: UUID, flag: String): Boolean {
+        val session = sessions[playerUuid]
+        return if (session != null) {
+            session.lock.withLock {
+                val added = session.data.addFlag(flag)
+                if (added) {
+                    dataManager.savePlayerOnlineData(session.data)
+                }
+                added
+            }
+        } else {
+            val data = dataManager.getPlayerOnlineData(playerUuid, LocalDate.now())
+            val added = data.addFlag(flag)
+            if (added) {
+                dataManager.savePlayerOnlineData(data)
+            }
+            added
+        }
+    }
+
+    fun hasFlag(playerUuid: UUID, flag: String): Boolean {
+        val session = sessions[playerUuid]
+        return if (session != null) {
+            session.lock.withLock {
+                session.data.hasFlag(flag)
+            }
+        } else {
+            val data = dataManager.getPlayerOnlineData(playerUuid, LocalDate.now())
+            data.hasFlag(flag)
+        }
+    }
+
     internal fun tick(nowMillis: Long = System.currentTimeMillis()) {
         settleAll(nowMillis)
     }
