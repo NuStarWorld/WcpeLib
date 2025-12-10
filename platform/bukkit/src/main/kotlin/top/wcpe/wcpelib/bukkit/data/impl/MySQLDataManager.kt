@@ -2,8 +2,10 @@ package top.wcpe.wcpelib.bukkit.data.impl
 
 import top.wcpe.wcpelib.bukkit.data.IDataManager
 import top.wcpe.wcpelib.bukkit.entity.PlayerData
+import top.wcpe.wcpelib.bukkit.entity.PlayerDailyLoginData
 import top.wcpe.wcpelib.bukkit.entity.PlayerOnlineData
 import top.wcpe.wcpelib.bukkit.mapper.PlayerDataMapper
+import top.wcpe.wcpelib.bukkit.mapper.PlayerDailyLoginMapper
 import top.wcpe.wcpelib.bukkit.mapper.PlayerOnlineMapper
 import top.wcpe.wcpelib.common.mybatis.Mybatis
 import java.time.LocalDate
@@ -24,10 +26,11 @@ import java.util.*
 class MySQLDataManager(private val mybatis: Mybatis) : IDataManager {
 
     init {
-        mybatis.addMapper(PlayerDataMapper::class.java, PlayerOnlineMapper::class.java)
+        mybatis.addMapper(PlayerDataMapper::class.java, PlayerOnlineMapper::class.java, PlayerDailyLoginMapper::class.java)
         mybatis.sqlSessionFactory.openSession(true).use { sqlSession ->
             sqlSession.getMapper(PlayerDataMapper::class.java).createTable()
             sqlSession.getMapper(PlayerOnlineMapper::class.java).createTable()
+            sqlSession.getMapper(PlayerDailyLoginMapper::class.java).createTable()
         }
     }
 
@@ -78,6 +81,20 @@ class MySQLDataManager(private val mybatis: Mybatis) : IDataManager {
         mybatis.sqlSessionFactory.openSession(true).use { sqlSession ->
             val mapper = sqlSession.getMapper(PlayerOnlineMapper::class.java)
             return mapper.sumOnlineMinutesBetween(playerUuid, startDate, endDate) ?: 0
+        }
+    }
+
+    override fun savePlayerDailyLoginData(data: PlayerDailyLoginData): Boolean {
+        mybatis.sqlSessionFactory.openSession(true).use { sqlSession ->
+            val mapper = sqlSession.getMapper(PlayerDailyLoginMapper::class.java)
+            return mapper.upsert(data) > 0
+        }
+    }
+
+    override fun getPlayerDailyLoginData(statDate: LocalDate): PlayerDailyLoginData {
+        mybatis.sqlSessionFactory.openSession(true).use { sqlSession ->
+            val mapper = sqlSession.getMapper(PlayerDailyLoginMapper::class.java)
+            return mapper.getByStatDate(statDate) ?: PlayerDailyLoginData.create(statDate)
         }
     }
 }

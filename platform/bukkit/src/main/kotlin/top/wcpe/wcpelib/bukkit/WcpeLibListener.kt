@@ -16,6 +16,7 @@ class WcpeLibListener : Listener {
             val player = e.player
             WcpeLib.playerOnlineManager.recordJoin(player)
             WcpeLib.playerOnlineManager.addLoginCount(player.uniqueId)
+            WcpeLib.playerDailyLoginManager.record(player.uniqueId)
             val firstPlayed = player.firstPlayed
 
             val playerData = WcpeLib.dataManager.getPlayerDataByName(player.name)

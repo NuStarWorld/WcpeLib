@@ -2,6 +2,7 @@ package top.wcpe.wcpelib.bukkit.data.impl
 
 import top.wcpe.wcpelib.bukkit.data.IDataManager
 import top.wcpe.wcpelib.bukkit.entity.PlayerData
+import top.wcpe.wcpelib.bukkit.entity.PlayerDailyLoginData
 import top.wcpe.wcpelib.bukkit.entity.PlayerOnlineData
 import java.time.LocalDate
 import java.util.*
@@ -41,5 +42,13 @@ class NullDataManager : IDataManager {
 
     override fun getPlayerOnlineMinutes(playerUuid: UUID, startDate: LocalDate, endDate: LocalDate): Int {
         return 0
+    }
+
+    override fun savePlayerDailyLoginData(data: PlayerDailyLoginData): Boolean {
+        return false
+    }
+
+    override fun getPlayerDailyLoginData(statDate: LocalDate): PlayerDailyLoginData {
+        return PlayerDailyLoginData.create(statDate)
     }
 }

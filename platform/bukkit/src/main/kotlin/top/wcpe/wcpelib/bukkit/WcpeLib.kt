@@ -14,6 +14,7 @@ import top.wcpe.wcpelib.bukkit.data.IDataManager
 import top.wcpe.wcpelib.bukkit.data.impl.MySQLDataManager
 import top.wcpe.wcpelib.bukkit.data.impl.NullDataManager
 import top.wcpe.wcpelib.bukkit.hook.PlaceholderAPIHook
+import top.wcpe.wcpelib.bukkit.manager.PlayerDailyLoginManager
 import top.wcpe.wcpelib.bukkit.manager.PlayerOnlineManager
 import top.wcpe.wcpelib.bukkit.version.VersionManager.versionInfo
 import top.wcpe.wcpelib.common.PlatformAdapter
@@ -47,6 +48,10 @@ class WcpeLib : JavaPlugin(), PlatformAdapter {
 
         @JvmStatic
         lateinit var playerOnlineManager: PlayerOnlineManager
+            private set
+
+        @JvmStatic
+        lateinit var playerDailyLoginManager: PlayerDailyLoginManager
             private set
 
         @JvmStatic
@@ -113,9 +118,11 @@ class WcpeLib : JavaPlugin(), PlatformAdapter {
         server.pluginManager.registerEvents(WcpeLibListener(), this)
         playerOnlineManager = PlayerOnlineManager(dataManager, this)
         playerOnlineManager.start()
+        playerDailyLoginManager = PlayerDailyLoginManager(dataManager)
         server.onlinePlayers.forEach { player ->
             pluginScope.launch {
                 playerOnlineManager.recordJoin(player)
+                playerDailyLoginManager.record(player.uniqueId)
             }
         }
         logger.info("load time: ${System.currentTimeMillis() - start} ms")

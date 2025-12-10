@@ -55,7 +55,7 @@ class WcpeLibPlaceholder : PlaceholderExpansion() {
             "todayOnlineMinutes", "todayOnlineTime" -> {
                 val uuid = resolveUuid(parts.getOrNull(1)) ?: return ""
                 val today = LocalDate.now()
-                WcpeLib.dataManager.getPlayerOnlineData(uuid, today).onlineMinutes.toString()
+                WcpeLib.dataManager.getPlayerOnlineMinutes(uuid, today, today).toString()
             }
 
             "todayLoginCount" -> {
@@ -73,7 +73,6 @@ class WcpeLibPlaceholder : PlaceholderExpansion() {
                         val start = today.with(DayOfWeek.MONDAY)
                         WcpeLib.dataManager.getPlayerOnlineMinutes(uuid, start, today)
                     }
-
                     "lastWeek" -> {
                         val mondayThisWeek = today.with(DayOfWeek.MONDAY)
                         val end = mondayThisWeek.minusDays(1)
