@@ -29,6 +29,10 @@ class WcpeLibPlaceholder : PlaceholderExpansion() {
     //%WcpeLib_onlineMinutes_thisWeek_{playerName}%
     //%WcpeLib_onlineMinutes_lastWeek_{playerName}%
     //%WcpeLib_onlineMinutes_thisMonth_{playerName}%
+    //%WcpeLib_todayOnlineMinutes%
+    //%WcpeLib_onlineMinutes_thisWeek%
+    //%WcpeLib_onlineMinutes_lastWeek%
+    //%WcpeLib_onlineMinutes_thisMonth%
     override fun onRequest(p: OfflinePlayer, identifier: String): String {
         when (identifier) {
             "server_name" -> return WcpeLib.getServerName()
@@ -53,7 +57,7 @@ class WcpeLibPlaceholder : PlaceholderExpansion() {
             }
 
             "todayOnlineMinutes", "todayOnlineTime" -> {
-                val uuid = resolveUuid(parts.getOrNull(1)) ?: return ""
+                val uuid = resolveUuid(parts.getOrNull(1)) ?: p.uniqueId
                 val today = LocalDate.now()
                 WcpeLib.dataManager.getPlayerOnlineMinutes(uuid, today, today).toString()
             }
@@ -66,7 +70,7 @@ class WcpeLibPlaceholder : PlaceholderExpansion() {
 
             "onlineMinutes" -> {
                 val scope = parts.getOrNull(1) ?: return ""
-                val uuid = resolveUuid(parts.getOrNull(2)) ?: return ""
+                val uuid = resolveUuid(parts.getOrNull(2)) ?: p.uniqueId
                 val today = LocalDate.now()
                 val result = when (scope) {
                     "thisWeek" -> {
