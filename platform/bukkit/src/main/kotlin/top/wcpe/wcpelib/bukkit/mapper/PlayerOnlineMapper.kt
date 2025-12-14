@@ -15,6 +15,12 @@ interface PlayerOnlineMapper {
 
     fun listByPlayerUuid(@Param("playerUuid") playerUuid: UUID): List<PlayerOnlineData>
 
+    fun listBetween(
+        @Param("playerUuid") playerUuid: UUID,
+        @Param("startDate") startDate: LocalDate,
+        @Param("endDate") endDate: LocalDate,
+    ): List<PlayerOnlineData>
+
     fun getByPlayerUuidAndStatDate(
         @Param("playerUuid") playerUuid: UUID,
         @Param("statDate") statDate: LocalDate

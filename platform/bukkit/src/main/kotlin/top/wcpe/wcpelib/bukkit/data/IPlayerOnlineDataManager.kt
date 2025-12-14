@@ -12,4 +12,5 @@ interface IPlayerOnlineDataManager {
     fun savePlayerOnlineData(playerOnlineData: PlayerOnlineData): Boolean
     fun getPlayerOnlineData(playerUuid: UUID, statDate: LocalDate): PlayerOnlineData
     fun getPlayerOnlineMinutes(playerUuid: UUID, startDate: LocalDate, endDate: LocalDate): Int
+    fun listPlayerOnlineData(playerUuid: UUID, startDate: LocalDate, endDate: LocalDate): List<PlayerOnlineData>
 }

@@ -95,6 +95,29 @@ class PlayerOnlineManager(
         }
     }
 
+    fun hasFlag(playerUuid: UUID, flag: String, startDate: LocalDate, endDate: LocalDate): Boolean {
+        require(!endDate.isBefore(startDate)) { "startDate must not be after endDate" }
+        val trimmedFlag = flag.trim()
+        if (trimmedFlag.isEmpty()) {
+            return false
+        }
+
+        val session = sessions[playerUuid]
+        if (session != null) {
+            val statDate = session.data.statDate
+            if (!statDate.isBefore(startDate) && !statDate.isAfter(endDate)) {
+                session.lock.withLock {
+                    if (session.data.hasFlag(trimmedFlag)) {
+                        return true
+                    }
+                }
+            }
+        }
+
+        return dataManager.listPlayerOnlineData(playerUuid, startDate, endDate)
+            .any { it.hasFlag(trimmedFlag) }
+    }
+
     internal fun tick(nowMillis: Long = System.currentTimeMillis()) {
         settleAll(nowMillis)
     }

@@ -77,6 +77,13 @@ class MySQLDataManager(private val mybatis: Mybatis) : IDataManager {
         }
     }
 
+    override fun listPlayerOnlineData(playerUuid: UUID, startDate: LocalDate, endDate: LocalDate): List<PlayerOnlineData> {
+        mybatis.sqlSessionFactory.openSession(true).use { sqlSession ->
+            val mapper = sqlSession.getMapper(PlayerOnlineMapper::class.java)
+            return mapper.listBetween(playerUuid, startDate, endDate)
+        }
+    }
+
     override fun getPlayerOnlineMinutes(playerUuid: UUID, startDate: LocalDate, endDate: LocalDate): Int {
         mybatis.sqlSessionFactory.openSession(true).use { sqlSession ->
             val mapper = sqlSession.getMapper(PlayerOnlineMapper::class.java)

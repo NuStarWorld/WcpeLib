@@ -40,6 +40,10 @@ class NullDataManager : IDataManager {
         return PlayerOnlineData.create(playerUuid)
     }
 
+    override fun listPlayerOnlineData(playerUuid: UUID, startDate: LocalDate, endDate: LocalDate): List<PlayerOnlineData> {
+        return emptyList()
+    }
+
     override fun getPlayerOnlineMinutes(playerUuid: UUID, startDate: LocalDate, endDate: LocalDate): Int {
         return 0
     }
