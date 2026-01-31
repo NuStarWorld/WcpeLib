@@ -1,6 +1,8 @@
 package top.wcpe.wcpelib.nukkit;
 
 
+import cn.nukkit.entity.custom.EntityDefinition;
+import cn.nukkit.entity.custom.EntityManager;
 import cn.nukkit.plugin.PluginBase;
 import lombok.Getter;
 import lombok.val;
@@ -147,6 +149,19 @@ public final class WcpeLib extends PluginBase implements PlatformAdapter {
                 if (keySection == null) {
                     continue;
                 }
+                EntityDefinition entityDefinition = EntityDefinition.builder()
+                        .identifier(keySection.getString("id"))
+                        .parentEntity(keySection.getString("bid"))
+                        .alternateName("")
+                        .spawnEgg(keySection.getBoolean("hasSpawnEgg"))
+                        .serverSideOnly(false)
+                        .runtimeId(keySection.getInt("rid")).build();
+                entityDefinition.setEntityBiFunction(((fullChunk, compoundTag) -> {
+                    CustomDefineEntity customDefineEntity = new CustomDefineEntity(fullChunk, compoundTag);
+                    customDefineEntity.setDefinition(entityDefinition);
+                    return customDefineEntity;
+                }));
+                EntityManager.get().registerDefinition(entityDefinition);
                 registerEntityInfoMap.put(key, new RegisterEntityInfo(key, keySection.getBoolean("hasSpawnEgg"), keySection.getBoolean("summonAble"), keySection.getString("id"), keySection.getString("bid"), keySection.getInt("rid")));
                 getLogger().info("读取 " + key + "成功 id -> " + keySection.getString("id"));
             }
